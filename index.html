@@ -7,169 +7,328 @@
     <title>Pusat Kendali - Super Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .nav-active { background-color: #eff6ff; color: #2563eb; font-weight: 700; border-right: 4px solid #2563eb; }
+        .nav-inactive { color: #64748b; font-weight: 500; }
+        .nav-inactive:hover { background-color: #f8fafc; color: #0f172a; }
+    </style>
 </head>
-<body class="bg-slate-100 font-sans antialiased text-slate-800">
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex min-h-screen">
 
-    <div id="loginSection" class="min-h-screen flex items-center justify-center px-4">
-        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 w-full max-w-md">
+    <div id="loginSection" class="fixed inset-0 bg-slate-100 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md">
             <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-shield-halved"></i></div>
                 <h2 class="text-2xl font-black text-slate-800">Bank Sentral</h2>
                 <p class="text-sm text-slate-500 mt-1">Sistem Otentikasi Terenkripsi</p>
             </div>
-            
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="mb-4">
-                    <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Username</label>
-                    <input type="text" id="username" required autocomplete="username" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Password</label>
-                    <input type="password" id="password" required autocomplete="current-password" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition duration-200">
-                    Otentikasi Akses
-                </button>
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-4"><label class="block text-xs uppercase font-bold text-slate-500 mb-2">Email Admin</label><input type="text" id="username" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div class="mb-6"><label class="block text-xs uppercase font-bold text-slate-500 mb-2">Password</label><input type="password" id="password" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500"></div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition duration-200">Otentikasi Akses</button>
             </form>
         </div>
     </div>
 
-    <div id="dashboardSection" class="hidden p-8 max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-            <div>
-                <h1 class="text-3xl font-extrabold text-slate-800 mb-2">Pusat Kendali Keuangan</h1>
-                <p class="text-slate-500">Pemantauan Ledger Multi-Tenant.</p>
-            </div>
-            <button onclick="handleLogout()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-bold self-start md:self-center border border-red-200">
+    <aside id="sidebar" class="hidden w-64 bg-white border-r border-gray-200 flex-col flex-shrink-0">
+        <div class="p-6 border-b border-gray-100">
+            <h2 class="text-xl font-black text-slate-800 tracking-tight"><i class="fa-solid fa-building-columns text-blue-600 mr-2"></i> BAKOEL</h2>
+            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mt-1">Super Admin Panel</p>
+        </div>
+        <nav class="flex-1 py-4 flex flex-col gap-1">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-active flex items-center w-full text-left px-6 py-3 text-sm transition-colors">
+                <i class="fa-solid fa-chart-pie w-6"></i> Dashboard Ledger
+            </button>
+            <button onclick="switchTab('profile')" id="nav-profile" class="nav-inactive flex items-center w-full text-left px-6 py-3 text-sm transition-colors">
+                <i class="fa-solid fa-id-card w-6"></i> Manajemen KYC Tenant
+            </button>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors">
                 <i class="fa-solid fa-power-off"></i> Akhiri Sesi
             </button>
         </div>
+    </aside>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
-                <h2 class="text-xl font-bold text-blue-600 mb-4"><i class="fa-solid fa-users"></i> Saldo Ledger Tenant</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-500 uppercase text-[10px]">
-                            <tr><th class="p-3">Identitas Toko</th><th class="p-3">Saldo Aktif</th><th class="p-3">Total Omzet</th></tr>
-                        </thead>
-                        <tbody id="tenantBalances"><tr><td colspan="3" class="p-4 text-center">Memuat...</td></tr></tbody>
-                    </table>
+    <main id="mainContent" class="hidden flex-1 overflow-y-auto p-8 relative">
+        
+        <div id="tab-dashboard" class="max-w-7xl mx-auto block">
+            <h1 class="text-3xl font-extrabold text-slate-800 mb-2">Pusat Kendali Keuangan</h1>
+            <p class="text-slate-500 mb-8">Pemantauan Ledger Multi-Tenant.</p>
+            
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-bold text-blue-600 mb-4"><i class="fa-solid fa-users"></i> Saldo Ledger Tenant</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px]">
+                                <tr><th class="p-3">Identitas Toko</th><th class="p-3">Saldo Aktif</th><th class="p-3">Total Omzet</th></tr>
+                            </thead>
+                            <tbody id="tenantBalances"><tr><td colspan="3" class="p-4 text-center">Memuat...</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
-                <h2 class="text-xl font-bold text-amber-500 mb-4"><i class="fa-solid fa-money-bill-transfer"></i> Antrean Pencairan</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-500 uppercase text-[10px]">
-                            <tr><th class="p-3">Tujuan Transaksi</th><th class="p-3">Nominal & Status</th><th class="p-3">Aksi</th></tr>
-                        </thead>
-                        <tbody id="withdrawalQueue"><tr><td colspan="3" class="p-4 text-center">Memuat...</td></tr></tbody>
-                    </table>
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-bold text-amber-500 mb-4"><i class="fa-solid fa-money-bill-transfer"></i> Antrean Pencairan</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px]">
+                                <tr><th class="p-3">Tujuan Transaksi</th><th class="p-3">Nominal & Status</th><th class="p-3">Aksi</th></tr>
+                            </thead>
+                            <tbody id="withdrawalQueue"><tr><td colspan="3" class="p-4 text-center">Memuat...</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <div id="tab-profile" class="max-w-7xl mx-auto hidden">
+            <h1 class="text-3xl font-extrabold text-slate-800 mb-2">Manajemen Profil & KYC Tenant</h1>
+            <p class="text-slate-500 mb-8">Pencatatan nomor identitas rahasia (KTP/NPWP) hanya tersimpan di database Super Admin.</p>
+
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 mb-6 flex items-end gap-4">
+                <div class="flex-1">
+                    <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Pilih Tenant untuk Dilihat</label>
+                    <select id="selectTenant" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
+                        <option value="">-- Memuat daftar Tenant... --</option>
+                    </select>
+                </div>
+                <button onclick="loadTenantProfile()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md transition-colors whitespace-nowrap">Cari Profil</button>
+            </div>
+
+            <div id="profileContent" class="hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Informasi Toko</h3>
+                            <div class="space-y-3 text-sm">
+                                <div><span class="text-xs font-bold text-gray-400 uppercase block">Nama Toko</span><span id="dt-toko" class="font-semibold text-slate-700">-</span></div>
+                                <div><span class="text-xs font-bold text-gray-400 uppercase block">Pemilik</span><span id="dt-pemilik" class="text-slate-700">-</span></div>
+                                <div><span class="text-xs font-bold text-gray-400 uppercase block">Telepon / WA</span><span id="dt-wa" class="text-slate-700">-</span></div>
+                                <div><span class="text-xs font-bold text-gray-400 uppercase block">Email</span><span id="dt-email" class="text-slate-700">-</span></div>
+                                <div><span class="text-xs font-bold text-gray-400 uppercase block">Alamat Penjemputan</span><span id="dt-alamat" class="text-slate-700 text-xs">-</span></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Rekening Terdaftar</h3>
+                            <div class="space-y-3 text-sm">
+                                <div><span class="text-xs font-bold text-gray-400 uppercase block">Nama Bank</span><span id="dt-bank" class="font-semibold text-blue-600">-</span></div>
+                                <div><span class="text-xs font-bold text-gray-400 uppercase block">Nomor Rekening</span><span id="dt-rekening" class="text-slate-700">-</span></div>
+                                <div><span class="text-xs font-bold text-gray-400 uppercase block">Atas Nama</span><span id="dt-atasnama" class="text-slate-700 uppercase">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <div class="bg-blue-50 rounded-3xl p-6 shadow-sm border border-blue-100">
+                            <h3 class="text-lg font-bold text-blue-800 mb-1"><i class="fa-solid fa-file-shield"></i> Data KYC (Khusus Super Admin)</h3>
+                            <p class="text-xs text-blue-600 mb-4">Input data KTP dan NPWP di sini. Data tidak akan dikirim ke server Tenant.</p>
+                            
+                            <form onsubmit="saveKYC(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="hidden" id="kyc-tenant-id">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor KTP (NIK)</label>
+                                    <input type="text" id="input-ktp" placeholder="Masukkan 16 digit NIK..." class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor NPWP</label>
+                                    <input type="text" id="input-npwp" placeholder="Masukkan 15/16 digit NPWP..." class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:border-blue-500">
+                                </div>
+                                <div class="md:col-span-2 flex justify-end mt-2">
+                                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md transition-colors"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Data KYC</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
+                                <h3 class="text-sm font-bold text-emerald-600 mb-4 border-b pb-2"><i class="fa-solid fa-arrow-turn-down"></i> Riwayat Masuk (Snapshot Pusat)</h3>
+                                <div class="mb-2">
+                                    <span class="text-xs font-bold text-gray-400 uppercase block">Total Pemasukan Tercatat</span>
+                                    <span id="dt-totalmasuk" class="text-2xl font-black text-emerald-600">-</span>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-gray-500 block">Terakhir Sinkron: <span id="dt-sinkron">-</span></span>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
+                                <h3 class="text-sm font-bold text-amber-600 mb-4 border-b pb-2"><i class="fa-solid fa-arrow-turn-up"></i> Riwayat Penarikan (Ledger Out)</h3>
+                                <div class="overflow-y-auto max-h-48 pr-2 custom-scrollbar">
+                                    <ul id="dt-riwayat-wd" class="space-y-3">
+                                        <li class="text-xs text-gray-500 italic">Pilih tenant untuk melihat riwayat...</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
 
     <script>
-        // URL Backend
         const BASE_URL = 'https://back-0amu.onrender.com';
-        
-        // [Mitigasi #41: Data Theft] Penggunaan sessionStorage lebih aman dari localStorage
         let token = sessionStorage.getItem("bakoel_super_token");
 
-        // [Mitigasi #1, #4, #93: XSS, HTML Injection, mXSS]
         function escapeHTML(str) {
-            if (!str) return '';
-            return str.toString()
-                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            if (!str) return '-';
+            return str.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
-
         function formatRp(num) { return "Rp " + Number(num).toLocaleString('id-ID'); }
 
+        // MENGATUR TAMPILAN TAB
+        function switchTab(tabName) {
+            document.getElementById('tab-dashboard').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('hidden');
+            
+            document.getElementById('nav-dashboard').className = 'nav-inactive flex items-center w-full text-left px-6 py-3 text-sm transition-colors';
+            document.getElementById('nav-profile').className = 'nav-inactive flex items-center w-full text-left px-6 py-3 text-sm transition-colors';
+            
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            document.getElementById('nav-' + tabName).className = 'nav-active flex items-center w-full text-left px-6 py-3 text-sm transition-colors';
+        }
+
+        // OTENTIKASI AWAL
         function checkAuthState() {
             if (token) {
                 document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('dashboardSection').classList.remove('hidden');
-                loadSuperAdminData();
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                loadDashboardData();
+                loadTenantListDropdown();
             } else {
                 document.getElementById('loginSection').classList.remove('hidden');
-                document.getElementById('dashboardSection').classList.add('hidden');
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('mainContent').classList.add('hidden');
             }
         }
 
-        async function handleLogin(event) {
-            event.preventDefault();
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
-
+        async function handleLogin(e) {
+            e.preventDefault();
             try {
                 const res = await fetch(`${BASE_URL}/api/super/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: u, password: p })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: document.getElementById('username').value, password: document.getElementById('password').value })
                 });
                 const data = await res.json();
-                if (res.ok) {
-                    token = data.token;
-                    sessionStorage.setItem("bakoel_super_token", token);
-                    checkAuthState();
-                } else { alert(data.error || "Gagal masuk."); }
-            } catch (e) { alert("Server tidak merespon."); }
+                if (res.ok) { token = data.token; sessionStorage.setItem("bakoel_super_token", token); checkAuthState(); } 
+                else { alert(data.error); }
+            } catch (err) { alert("Server tidak merespon. Pastikan backend Render menyala."); }
         }
 
-        function handleLogout() {
-            sessionStorage.removeItem("bakoel_super_token");
-            token = null;
-            checkAuthState();
-        }
+        function handleLogout() { sessionStorage.removeItem("bakoel_super_token"); token = null; checkAuthState(); }
 
-        async function loadSuperAdminData() {
+        // ================= FITUR TAB 1: DASHBOARD =================
+        async function loadDashboardData() {
             try {
                 const resBal = await fetch(`${BASE_URL}/api/super/balances`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if(resBal.status === 401 || resBal.status === 403) return handleLogout();
-                
                 const balances = await resBal.json();
                 document.getElementById('tenantBalances').innerHTML = balances.map(b => `
-                    <tr class="border-b">
-                        <td class="p-3"><b>${escapeHTML(b.nama_toko)}</b><br><span class="text-[10px] text-gray-500">${escapeHTML(b.nama_pemilik)} (${escapeHTML(b.no_wa)})</span></td>
-                        <td class="p-3 font-bold text-emerald-600">${formatRp(b.saldo_tersedia)}</td>
-                        <td class="p-3 text-gray-400">${formatRp(b.total_masuk)}</td>
-                    </tr>
+                    <tr class="border-b"><td class="p-3"><b>${escapeHTML(b.nama_toko)}</b><br><span class="text-[10px] text-gray-500">${escapeHTML(b.nama_pemilik)}</span></td><td class="p-3 font-bold text-emerald-600">${formatRp(b.saldo_tersedia)}</td><td class="p-3 text-gray-400">${formatRp(b.total_masuk)}</td></tr>
                 `).join('');
 
                 const resWd = await fetch(`${BASE_URL}/api/super/withdrawals`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const withdraws = await resWd.json();
                 document.getElementById('withdrawalQueue').innerHTML = withdraws.map(w => {
                     const statusClass = w.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600';
-                    return `
-                    <tr class="border-b">
-                        <td class="p-3"><b>${escapeHTML(w.nama_toko)}</b><br><span class="text-xs text-blue-600">${escapeHTML(w.bank)} - ${escapeHTML(w.rekening)}</span><br><span class="text-[10px] uppercase font-bold text-gray-500">A/N: ${escapeHTML(w.atas_nama)}</span></td>
-                        <td class="p-3 font-bold text-amber-600">${formatRp(w.nominal)}<br>
-                            <span class="text-[10px] ${statusClass} px-2 rounded">${escapeHTML(w.status)}</span>
-                        </td>
-                        <td class="p-3">
-                            ${w.status === 'Pending' ? `<button onclick="approveTransfer('${escapeHTML(w.id)}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded text-xs font-bold shadow">Setujui Pencairan</button>` : `<span class="text-xs text-gray-400">Selesai</span>`}
-                        </td>
-                    </tr>
-                    `;
+                    return `<tr class="border-b"><td class="p-3"><b>${escapeHTML(w.nama_toko)}</b><br><span class="text-xs text-blue-600">${escapeHTML(w.bank)} - ${escapeHTML(w.rekening)}</span></td><td class="p-3 font-bold text-amber-600">${formatRp(w.nominal)}<br><span class="text-[10px] ${statusClass} px-2 rounded">${escapeHTML(w.status)}</span></td><td class="p-3">${w.status === 'Pending' ? `<button onclick="approveTransfer('${escapeHTML(w.id)}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold">Setujui</button>` : `<span class="text-[10px] text-gray-400">Selesai</span>`}</td></tr>`;
                 }).join('');
             } catch(e) { console.error(e); }
         }
 
         async function approveTransfer(id) {
             if(!confirm("Anda yakin dana sudah berhasil ditransfer di bank?")) return;
+            const res = await fetch(`${BASE_URL}/api/super/withdrawals/${id}/approve`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+            if(res.ok) { loadDashboardData(); } else { alert("Gagal memproses."); }
+        }
+
+        // ================= FITUR TAB 2: PROFIL & KYC =================
+        async function loadTenantListDropdown() {
+            // Kita gunakan data dari balances untuk mengisi dropdown
+            const res = await fetch(`${BASE_URL}/api/super/balances`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if(res.ok) {
+                const data = await res.json();
+                document.getElementById('selectTenant').innerHTML = '<option value="">-- Pilih Tenant --</option>' + 
+                    data.map(t => `<option value="${t.tenant_id}">${escapeHTML(t.nama_toko)} (${escapeHTML(t.nama_pemilik)})</option>`).join('');
+            }
+        }
+
+        async function loadTenantProfile() {
+            const tenantId = document.getElementById('selectTenant').value;
+            if(!tenantId) return alert("Pilih tenant terlebih dahulu!");
+
             try {
-                const res = await fetch(`${BASE_URL}/api/super/withdrawals/${id}/approve`, {
-                    method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
+                const res = await fetch(`${BASE_URL}/api/super/tenants/${tenantId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if(!res.ok) throw new Error("Gagal mengambil profil.");
+                const data = await res.json();
+
+                // Tampilkan Area Detail
+                document.getElementById('profileContent').classList.remove('hidden');
+
+                // Isi Info Toko & Bank
+                const p = data.profil;
+                document.getElementById('dt-toko').innerText = p.nama_toko || '-';
+                document.getElementById('dt-pemilik').innerText = p.nama_pemilik || '-';
+                document.getElementById('dt-wa').innerText = p.nomor_wa || '-';
+                document.getElementById('dt-email').innerText = p.email || '-';
+                document.getElementById('dt-alamat').innerText = p.alamat || '-';
+                document.getElementById('dt-bank').innerText = p.bank_nama || '-';
+                document.getElementById('dt-rekening').innerText = p.bank_rekening || '-';
+                document.getElementById('dt-atasnama').innerText = p.bank_atas_nama || '-';
+
+                // Isi Form KYC (Siap diubah)
+                document.getElementById('kyc-tenant-id').value = p.id;
+                document.getElementById('input-ktp').value = p.no_ktp !== '-' ? p.no_ktp : '';
+                document.getElementById('input-npwp').value = p.no_npwp !== '-' ? p.no_npwp : '';
+
+                // Isi Riwayat
+                const k = data.keuangan;
+                document.getElementById('dt-totalmasuk').innerText = formatRp(k.total_masuk);
+                document.getElementById('dt-sinkron').innerText = k.terakhir_sinkron_masuk;
+
+                if(k.riwayat_penarikan.length > 0) {
+                    document.getElementById('dt-riwayat-wd').innerHTML = k.riwayat_penarikan.map(w => {
+                        const isDone = w.status === 'Selesai';
+                        return `
+                        <li class="border-b border-gray-100 pb-2 mb-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-bold ${isDone ? 'text-gray-700' : 'text-amber-600'}">${formatRp(w.nominal)}</span>
+                                <span class="text-[10px] px-2 rounded ${isDone ? 'bg-gray-100 text-gray-600' : 'bg-amber-100 text-amber-600'}">${escapeHTML(w.status)}</span>
+                            </div>
+                            <span class="text-[10px] text-gray-400 block">${escapeHTML(w.waktu)}</span>
+                        </li>`;
+                    }).join('');
+                } else {
+                    document.getElementById('dt-riwayat-wd').innerHTML = '<li class="text-xs text-gray-500 italic">Belum ada riwayat penarikan.</li>';
+                }
+
+            } catch (err) { alert(err.message); }
+        }
+
+        async function saveKYC(e) {
+            e.preventDefault();
+            const tenantId = document.getElementById('kyc-tenant-id').value;
+            const ktp = document.getElementById('input-ktp').value;
+            const npwp = document.getElementById('input-npwp').value;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/super/tenants/${tenantId}/kyc`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ no_ktp: ktp, no_npwp: npwp })
                 });
-                if(res.ok) loadSuperAdminData();
-                else alert("Gagal memproses pengajuan.");
-            } catch(e) { alert("Gangguan koneksi."); }
+                const data = await res.json();
+                if(res.ok) { alert("Sukses: " + data.message); } 
+                else { alert("Gagal: " + data.error); }
+            } catch(err) { alert("Gagal menghubungi server."); }
         }
 
         window.onload = checkAuthState;
