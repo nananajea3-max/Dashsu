@@ -11,7 +11,6 @@
         .nav-active { background-color: #eff6ff; color: #2563eb; font-weight: 700; border-right: 4px solid #2563eb; }
         .nav-inactive { color: #64748b; font-weight: 500; }
         .nav-inactive:hover { background-color: #f8fafc; color: #0f172a; }
-        /* Scrollbar kustom agar lebih rapi */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -28,8 +27,14 @@
                 <p class="text-sm text-slate-500 mt-1">Sistem Otentikasi Terenkripsi</p>
             </div>
             <form onsubmit="handleLogin(event)">
-                <div class="mb-4"><label class="block text-xs uppercase font-bold text-slate-500 mb-2">Email Admin</label><input type="text" id="username" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div class="mb-6"><label class="block text-xs uppercase font-bold text-slate-500 mb-2">Password</label><input type="password" id="password" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div class="mb-4">
+                    <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Username / Email</label>
+                    <input type="text" id="username" required autocomplete="username" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Password</label>
+                    <input type="password" id="password" required autocomplete="current-password" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
+                </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition duration-200">Otentikasi Akses</button>
             </form>
         </div>
@@ -69,7 +74,7 @@
                             <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] sticky top-0">
                                 <tr><th class="p-3">Identitas Toko</th><th class="p-3">Saldo Aktif</th><th class="p-3">Total Omzet</th></tr>
                             </thead>
-                            <tbody id="tenantBalances"><tr><td colspan="3" class="p-4 text-center">Memuat...</td></tr></tbody>
+                            <tbody id="tenantBalances"><tr><td colspan="3" class="p-4 text-center text-gray-400">Memuat data dari server...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -81,7 +86,7 @@
                             <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] sticky top-0">
                                 <tr><th class="p-3">Tujuan Transaksi</th><th class="p-3">Nominal & Status</th><th class="p-3">Aksi</th></tr>
                             </thead>
-                            <tbody id="withdrawalQueue"><tr><td colspan="3" class="p-4 text-center">Memuat...</td></tr></tbody>
+                            <tbody id="withdrawalQueue"><tr><td colspan="3" class="p-4 text-center text-gray-400">Memuat data dari server...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -93,7 +98,6 @@
             <p class="text-slate-500 mb-8">Pencatatan nomor identitas rahasia (KTP/NPWP) hanya tersimpan di database Super Admin.</p>
 
             <div id="tenantListView">
-                
                 <div class="relative w-full max-w-lg mb-8">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
@@ -112,13 +116,11 @@
             </div>
 
             <div id="profileContent" class="hidden">
-                
                 <button onclick="backToTenantList()" class="mb-6 bg-white border border-gray-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all flex items-center gap-2">
                     <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Tenant
                 </button>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
                     <div class="lg:col-span-1 space-y-6">
                         <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
                             <h3 class="text-lg font-bold text-slate-800 mb-4 border-b border-gray-100 pb-2">Informasi Toko</h3>
@@ -142,7 +144,6 @@
                     </div>
 
                     <div class="lg:col-span-2 space-y-6">
-                        
                         <div class="bg-blue-50 rounded-3xl p-6 shadow-sm border border-blue-100 relative overflow-hidden">
                             <div class="absolute -right-6 -top-6 text-blue-100 text-9xl opacity-50 pointer-events-none"><i class="fa-solid fa-shield-halved"></i></div>
                             <h3 class="text-lg font-bold text-blue-800 mb-1 relative z-10"><i class="fa-solid fa-file-shield mr-1"></i> Data KYC Rahasia</h3>
@@ -172,7 +173,7 @@
                                     <span id="dt-totalmasuk" class="text-2xl font-black text-emerald-600">-</span>
                                 </div>
                                 <div>
-                                    <span class="text-[10px] text-gray-400 block bg-slate-50 px-2 py-1 rounded inline-block border border-slate-100"><i class="fa-solid fa-rotate mr-1"></i> Terakhir Sinkron: <span id="dt-sinkron" class="font-medium">-</span></span>
+                                    <span class="text-[10px] text-gray-400 block bg-slate-50 px-2 py-1 rounded border border-slate-100 inline-block"><i class="fa-solid fa-rotate mr-1"></i> Terakhir Sinkron: <span id="dt-sinkron" class="font-medium">-</span></span>
                                 </div>
                             </div>
 
@@ -185,7 +186,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -194,16 +194,19 @@
     </main>
 
     <script>
+        // 1. KONFIGURASI URL & TOKEN (Mitigasi #41 Data Theft dengan Session Storage)
         const BASE_URL = 'https://back-0amu.onrender.com';
         let token = sessionStorage.getItem("bakoel_super_token");
-        let globalTenants = []; // Menyimpan data tenant untuk live search
+        let globalTenants = []; 
 
+        // 2. 🛡️ FUNGSI KEAMANAN: ANTI XSS & HTML INJECTION (Mitigasi #1, #4, #93)
         function escapeHTML(str) {
             if (!str) return '-';
             return str.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
         function formatRp(num) { return "Rp " + Number(num).toLocaleString('id-ID'); }
 
+        // 3. LOGIKA TABS
         function switchTab(tabName) {
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-profile').classList.add('hidden');
@@ -214,13 +217,14 @@
             document.getElementById('nav-' + tabName).className = 'nav-active flex items-center w-full text-left px-6 py-3 text-sm transition-colors';
         }
 
+        // 4. OTENTIKASI & SESI
         function checkAuthState() {
             if (token) {
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('sidebar').classList.remove('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
                 loadDashboardData();
-                loadTenantGridSummary(); // Load data grid tenant
+                loadTenantGridSummary();
             } else {
                 document.getElementById('loginSection').classList.remove('hidden');
                 document.getElementById('sidebar').classList.add('hidden');
@@ -238,39 +242,59 @@
                 const data = await res.json();
                 if (res.ok) { token = data.token; sessionStorage.setItem("bakoel_super_token", token); checkAuthState(); } 
                 else { alert(data.error); }
-            } catch (err) { alert("Server tidak merespon. Pastikan backend Render menyala."); }
+            } catch (err) { alert("Server Pusat Tidak Merespon."); }
         }
 
         function handleLogout() { sessionStorage.removeItem("bakoel_super_token"); token = null; checkAuthState(); }
 
-        // ================= TAB 1: DASHBOARD =================
+        // 5. RENDER DASHBOARD UTAMA
         async function loadDashboardData() {
             try {
                 const resBal = await fetch(`${BASE_URL}/api/super/balances`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if(resBal.status === 401 || resBal.status === 403) return handleLogout();
                 const balances = await resBal.json();
+                
                 document.getElementById('tenantBalances').innerHTML = balances.map(b => `
-                    <tr class="border-b hover:bg-slate-50 transition-colors"><td class="p-3"><b>${escapeHTML(b.nama_toko)}</b><br><span class="text-[10px] text-gray-500">${escapeHTML(b.nama_pemilik)}</span></td><td class="p-3 font-bold text-emerald-600">${formatRp(b.saldo_tersedia)}</td><td class="p-3 text-gray-400">${formatRp(b.total_masuk)}</td></tr>
+                    <tr class="border-b hover:bg-slate-50 transition-colors">
+                        <td class="p-3"><b>${escapeHTML(b.nama_toko)}</b><br><span class="text-[10px] text-gray-500">${escapeHTML(b.nama_pemilik)}</span></td>
+                        <td class="p-3 font-bold text-emerald-600">${formatRp(b.saldo_tersedia)}</td>
+                        <td class="p-3 text-gray-400">${formatRp(b.total_masuk)}</td>
+                    </tr>
                 `).join('');
 
                 const resWd = await fetch(`${BASE_URL}/api/super/withdrawals`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const withdraws = await resWd.json();
+                
                 document.getElementById('withdrawalQueue').innerHTML = withdraws.map(w => {
                     const statusClass = w.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600';
-                    return `<tr class="border-b hover:bg-slate-50 transition-colors"><td class="p-3"><b>${escapeHTML(w.nama_toko)}</b><br><span class="text-xs text-blue-600">${escapeHTML(w.bank)} - ${escapeHTML(w.rekening)}</span></td><td class="p-3 font-bold text-amber-600">${formatRp(w.nominal)}<br><span class="text-[10px] ${statusClass} px-2 rounded">${escapeHTML(w.status)}</span></td><td class="p-3">${w.status === 'Pending' ? `<button onclick="approveTransfer('${escapeHTML(w.id)}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors">Setujui</button>` : `<span class="text-[10px] text-gray-400"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Selesai</span>`}</td></tr>`;
+                    return `
+                    <tr class="border-b hover:bg-slate-50 transition-colors">
+                        <td class="p-3">
+                            <b>${escapeHTML(w.nama_toko)}</b> <span class="text-[10px] text-gray-500">(${escapeHTML(w.nama_pemilik)})</span><br>
+                            <span class="text-xs text-blue-600 font-bold">${escapeHTML(w.bank)} - ${escapeHTML(w.rekening)}</span><br>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">A/N: ${escapeHTML(w.atas_nama)}</span>
+                        </td>
+                        <td class="p-3 font-bold text-amber-600">
+                            ${formatRp(w.nominal)}<br>
+                            <span class="text-[10px] ${statusClass} px-2 rounded">${escapeHTML(w.status)}</span>
+                        </td>
+                        <td class="p-3">
+                            ${w.status === 'Pending' ? `<button onclick="approveTransfer('${escapeHTML(w.id)}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors">Setujui</button>` : `<span class="text-[10px] text-gray-400"><i class="fa-solid fa-check text-emerald-500 mr-1"></i>Selesai</span>`}
+                        </td>
+                    </tr>`;
                 }).join('');
             } catch(e) { console.error(e); }
         }
 
         async function approveTransfer(id) {
             if(!confirm("Anda yakin dana sudah berhasil ditransfer di bank?")) return;
-            const res = await fetch(`${BASE_URL}/api/super/withdrawals/${id}/approve`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
-            if(res.ok) { loadDashboardData(); } else { alert("Gagal memproses."); }
+            try {
+                const res = await fetch(`${BASE_URL}/api/super/withdrawals/${id}/approve`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+                if(res.ok) { loadDashboardData(); } else { alert("Gagal memproses."); }
+            } catch(e) { alert("Server Error."); }
         }
 
-        // ================= TAB 2: PROFIL, GRID & KYC =================
-
-        // 1. Ambil & Render Grid
+        // 6. RENDER TENANT GRID & SEARCH
         async function loadTenantGridSummary() {
             try {
                 const res = await fetch(`${BASE_URL}/api/super/balances`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -290,9 +314,7 @@
             grid.innerHTML = tenants.map(t => `
                 <div onclick="openTenantDetail('${escapeHTML(t.tenant_id)}')" class="bg-white p-5 rounded-3xl border border-gray-200 shadow-sm cursor-pointer hover:shadow-lg hover:border-blue-300 transition-all group transform hover:-translate-y-1">
                     <div class="flex items-start gap-3 mb-4">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl group-hover:bg-blue-600 group-hover:text-white transition-colors flex-shrink-0">
-                            <i class="fa-solid fa-store"></i>
-                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl group-hover:bg-blue-600 group-hover:text-white transition-colors flex-shrink-0"><i class="fa-solid fa-store"></i></div>
                         <div class="overflow-hidden">
                             <h3 class="font-black text-slate-800 text-sm truncate group-hover:text-blue-700 transition-colors">${escapeHTML(t.nama_toko)}</h3>
                             <p class="text-[10px] text-slate-500 uppercase tracking-wider truncate">${escapeHTML(t.nama_pemilik)}</p>
@@ -303,31 +325,25 @@
                             <span class="text-[8px] uppercase font-bold text-slate-400 block mb-0.5">Saldo Mengendap</span>
                             <span class="text-xs font-black text-emerald-600">${formatRp(t.saldo_tersedia)}</span>
                         </div>
-                        <div class="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
-                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                        </div>
+                        <div class="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors"><i class="fa-solid fa-chevron-right text-[10px]"></i></div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // 2. Fungsi Filter Search Bar
         function filterTenantGrid() {
             const query = document.getElementById('searchTenantInput').value.toLowerCase();
             const btnClear = document.getElementById('clearSearchBtn');
-            
-            // Tampilkan/Sembunyikan tombol Silang (X)
             btnClear.classList.toggle('hidden', query.length === 0);
 
             const filtered = globalTenants.filter(t => 
-                t.nama_toko.toLowerCase().includes(query) || 
-                t.nama_pemilik.toLowerCase().includes(query) ||
-                t.tenant_id.toLowerCase().includes(query)
+                (t.nama_toko || '').toLowerCase().includes(query) || 
+                (t.nama_pemilik || '').toLowerCase().includes(query) ||
+                (t.tenant_id || '').toLowerCase().includes(query)
             );
             renderTenantGrid(filtered);
         }
 
-        // 3. Tombol Silang (X) Ditekan
         function clearTenantSearch() {
             const input = document.getElementById('searchTenantInput');
             input.value = '';
@@ -335,20 +351,18 @@
             input.focus();
         }
 
-        // 4. Kartu Ditekan -> Buka Profil
         function openTenantDetail(tenantId) {
             document.getElementById('tenantListView').classList.add('hidden');
             document.getElementById('profileContent').classList.remove('hidden');
             fetchAndShowProfile(tenantId);
         }
 
-        // 5. Tombol Kembali
         function backToTenantList() {
             document.getElementById('profileContent').classList.add('hidden');
             document.getElementById('tenantListView').classList.remove('hidden');
         }
 
-        // 6. Tarik Data Spesifik Tenant
+        // 7. RENDER PROFIL DETAIL
         async function fetchAndShowProfile(tenantId) {
             document.getElementById('dt-toko').innerHTML = '<i class="fa-solid fa-spinner fa-spin text-slate-300"></i>';
             try {
@@ -372,7 +386,7 @@
 
                 const k = data.keuangan;
                 document.getElementById('dt-totalmasuk').innerText = formatRp(k.total_masuk);
-                document.getElementById('dt-sinkron').innerText = k.terakhir_sinkron_masuk;
+                document.getElementById('dt-sinkron').innerText = escapeHTML(k.terakhir_sinkron_masuk);
 
                 if(k.riwayat_penarikan.length > 0) {
                     document.getElementById('dt-riwayat-wd').innerHTML = k.riwayat_penarikan.map(w => {
@@ -393,6 +407,7 @@
             } catch (err) { alert(err.message); backToTenantList(); }
         }
 
+        // 8. SIMPAN FORM KYC
         async function saveKYC(e) {
             e.preventDefault();
             const tenantId = document.getElementById('kyc-tenant-id').value;
@@ -411,7 +426,7 @@
                     body: JSON.stringify({ no_ktp: ktp, no_npwp: npwp })
                 });
                 const data = await res.json();
-                if(res.ok) { alert("Data KYC Tersimpan!"); } 
+                if(res.ok) { alert("Data KYC Tersimpan dengan Aman!"); } 
                 else { alert("Gagal: " + data.error); }
             } catch(err) { alert("Gagal menghubungi server pusat."); }
             
