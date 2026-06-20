@@ -3,114 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pusat Kendali Keuangan - Super Admin</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'unsafe-inline' https://cdnjs.cloudflare.com; font-src https://cdnjs.cloudflare.com; connect-src 'self' https://rust-vjn7.onrender.com;">
+    <title>Pusat Kendali - Super Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-slate-100 p-8 font-sans antialiased text-slate-800">
+<body class="bg-slate-100 font-sans antialiased text-slate-800">
 
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-extrabold text-slate-800 mb-2">Pusat Kendali Keuangan (Super Admin)</h1>
-        <p class="text-slate-500 mb-8">Pantau total omzet seluruh Tenant dan kelola antrean transfer pencairan dana.</p>
+    <div id="loginSection" class="min-h-screen flex items-center justify-center px-4">
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800">Bank Sentral</h2>
+                <p class="text-sm text-slate-500 mt-1">Sistem Otentikasi Terenkripsi</p>
+            </div>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Username</label>
+                    <input type="text" id="username" required autocomplete="username" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Password</label>
+                    <input type="password" id="password" required autocomplete="current-password" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition duration-200">
+                    Otentikasi Akses
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboardSection" class="hidden p-8 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-800 mb-2">Pusat Kendali Keuangan</h1>
+                <p class="text-slate-500">Pemantauan Ledger Multi-Tenant.</p>
+            </div>
+            <button onclick="handleLogout()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-bold self-start md:self-center border border-red-200">
+                <i class="fa-solid fa-power-off"></i> Akhiri Sesi
+            </button>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
-                <h2 class="text-xl font-bold text-blue-600 mb-4"><i class="fa-solid fa-users"></i> Saldo Seluruh Tenant</h2>
+                <h2 class="text-xl font-bold text-blue-600 mb-4"><i class="fa-solid fa-users"></i> Saldo Ledger Tenant</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-50 text-slate-500 uppercase text-[10px]">
-                            <tr>
-                                <th class="p-3">Nama Toko</th>
-                                <th class="p-3">Saldo Mengendap</th>
-                                <th class="p-3">Total Omzet</th>
-                            </tr>
+                            <tr><th class="p-3">Identitas Toko</th><th class="p-3">Saldo Aktif</th><th class="p-3">Total Omzet</th></tr>
                         </thead>
-                        <tbody id="tenantBalances">
-                            <tr><td colspan="3" class="p-4 text-center">Memuat data dari Server...</td></tr>
-                        </tbody>
+                        <tbody id="tenantBalances"><tr><td colspan="3" class="p-4 text-center">Memuat...</td></tr></tbody>
                     </table>
                 </div>
             </div>
 
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
-                <h2 class="text-xl font-bold text-amber-500 mb-4"><i class="fa-solid fa-money-bill-transfer"></i> Antrean Transfer Pencairan</h2>
+                <h2 class="text-xl font-bold text-amber-500 mb-4"><i class="fa-solid fa-money-bill-transfer"></i> Antrean Pencairan</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-50 text-slate-500 uppercase text-[10px]">
-                            <tr>
-                                <th class="p-3">Toko & Rekening</th>
-                                <th class="p-3">Nominal</th>
-                                <th class="p-3">Aksi Transfer</th>
-                            </tr>
+                            <tr><th class="p-3">Tujuan Transaksi</th><th class="p-3">Nominal & Status</th><th class="p-3">Aksi</th></tr>
                         </thead>
-                        <tbody id="withdrawalQueue">
-                            <tr><td colspan="3" class="p-4 text-center">Memuat antrean...</td></tr>
-                        </tbody>
+                        <tbody id="withdrawalQueue"><tr><td colspan="3" class="p-4 text-center">Memuat...</td></tr></tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script>
-        // Simulasi Token Super Admin (Anda harus mengatur login Super Admin)
-        const token = "TOKEN_SUPER_ADMIN_ANDA_DISINI"; 
+        // URL Backend
         const BASE_URL = 'https://rust-vjn7.onrender.com';
+        
+        // [Mitigasi #41: Data Theft] Penggunaan sessionStorage lebih aman dari localStorage
+        let token = sessionStorage.getItem("bakoel_super_token");
+
+        // [Mitigasi #1, #4, #93: XSS, HTML Injection, mXSS]
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.toString()
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
 
         function formatRp(num) { return "Rp " + Number(num).toLocaleString('id-ID'); }
 
+        function checkAuthState() {
+            if (token) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                loadSuperAdminData();
+            } else {
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('dashboardSection').classList.add('hidden');
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/super/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    token = data.token;
+                    sessionStorage.setItem("bakoel_super_token", token);
+                    checkAuthState();
+                } else { alert(data.error || "Gagal masuk."); }
+            } catch (e) { alert("Server tidak merespon."); }
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem("bakoel_super_token");
+            token = null;
+            checkAuthState();
+        }
+
         async function loadSuperAdminData() {
             try {
-                // 1. Tarik Data Saldo Tenant
                 const resBal = await fetch(`${BASE_URL}/api/super/balances`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const balances = await resBal.json();
+                if(resBal.status === 401 || resBal.status === 403) return handleLogout();
                 
-                const balHtml = balances.map(b => `
+                const balances = await resBal.json();
+                document.getElementById('tenantBalances').innerHTML = balances.map(b => `
                     <tr class="border-b">
-                        <td class="p-3"><b>${b.nama_toko}</b><br><span class="text-[10px] text-gray-500">${b.nama_pemilik} (${b.no_wa})</span></td>
+                        <td class="p-3"><b>${escapeHTML(b.nama_toko)}</b><br><span class="text-[10px] text-gray-500">${escapeHTML(b.nama_pemilik)} (${escapeHTML(b.no_wa)})</span></td>
                         <td class="p-3 font-bold text-emerald-600">${formatRp(b.saldo_tersedia)}</td>
                         <td class="p-3 text-gray-400">${formatRp(b.total_masuk)}</td>
                     </tr>
                 `).join('');
-                document.getElementById('tenantBalances').innerHTML = balHtml;
 
-                // 2. Tarik Antrean Penarikan
                 const resWd = await fetch(`${BASE_URL}/api/super/withdrawals`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const withdraws = await resWd.json();
-
-                const wdHtml = withdraws.map(w => `
+                document.getElementById('withdrawalQueue').innerHTML = withdraws.map(w => {
+                    const statusClass = w.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600';
+                    return `
                     <tr class="border-b">
-                        <td class="p-3"><b>${w.nama_toko}</b><br><span class="text-xs text-blue-600">${w.bank} - ${w.rekening}</span><br><span class="text-[10px] uppercase font-bold text-gray-500">A/N: ${w.atas_nama}</span></td>
+                        <td class="p-3"><b>${escapeHTML(w.nama_toko)}</b><br><span class="text-xs text-blue-600">${escapeHTML(w.bank)} - ${escapeHTML(w.rekening)}</span><br><span class="text-[10px] uppercase font-bold text-gray-500">A/N: ${escapeHTML(w.atas_nama)}</span></td>
                         <td class="p-3 font-bold text-amber-600">${formatRp(w.nominal)}<br>
-                            <span class="text-[10px] bg-${w.status === 'Pending' ? 'amber' : 'emerald'}-100 text-${w.status === 'Pending' ? 'amber' : 'emerald'}-600 px-2 rounded">${w.status}</span>
+                            <span class="text-[10px] ${statusClass} px-2 rounded">${escapeHTML(w.status)}</span>
                         </td>
                         <td class="p-3">
-                            ${w.status === 'Pending' ? `<button onclick="approveTransfer('${w.id}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded text-xs font-bold shadow">Ubah ke Selesai</button>` : `<span class="text-xs text-gray-400">Telah Ditransfer</span>`}
+                            ${w.status === 'Pending' ? `<button onclick="approveTransfer('${escapeHTML(w.id)}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded text-xs font-bold shadow">Setujui Pencairan</button>` : `<span class="text-xs text-gray-400">Selesai</span>`}
                         </td>
                     </tr>
-                `).join('');
-                document.getElementById('withdrawalQueue').innerHTML = wdHtml;
-
+                    `;
+                }).join('');
             } catch(e) { console.error(e); }
         }
 
         async function approveTransfer(id) {
-            if(!confirm("Apakah Anda yakin SUDAH men-transfer uang ini ke rekening tenant tersebut?")) return;
-            
+            if(!confirm("Anda yakin dana sudah berhasil ditransfer di bank?")) return;
             try {
                 const res = await fetch(`${BASE_URL}/api/super/withdrawals/${id}/approve`, {
                     method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if(res.ok) {
-                    alert("Sukses! Status penarikan berubah menjadi Selesai.");
-                    loadSuperAdminData(); // Refresh Tabel
-                }
-            } catch(e) { alert("Gagal memproses."); }
+                if(res.ok) loadSuperAdminData();
+                else alert("Gagal memproses pengajuan.");
+            } catch(e) { alert("Gangguan koneksi."); }
         }
 
-        window.onload = loadSuperAdminData;
+        window.onload = checkAuthState;
     </script>
 </body>
 </html>
