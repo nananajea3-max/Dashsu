@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'unsafe-inline' https://cdnjs.cloudflare.com; font-src https://cdnjs.cloudflare.com; connect-src 'self' https://back-0amu.onrender.com;">
+    <meta name="referrer" content="no-referrer">
+    
     <title>Pusat Kendali - Super Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -16,6 +19,16 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
+
+    <style id="antiClickjack">body{display:none !important;}</style>
+    <script>
+        if (self === top) {
+            var antiClickjack = document.getElementById("antiClickjack");
+            antiClickjack.parentNode.removeChild(antiClickjack);
+        } else {
+            top.location = self.location;
+        }
+    </script>
 </head>
 <body class="bg-slate-50 font-sans antialiased text-slate-800 flex min-h-screen">
 
@@ -26,7 +39,7 @@
                 <h2 class="text-2xl font-black text-slate-800">Bank Sentral</h2>
                 <p class="text-sm text-slate-500 mt-1">Sistem Otentikasi Terenkripsi</p>
             </div>
-            <form onsubmit="handleLogin(event)">
+            <form id="loginFormNode" onsubmit="handleLogin(event)">
                 <div class="mb-4">
                     <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Username / Email</label>
                     <input type="text" id="username" required autocomplete="username" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
@@ -35,7 +48,7 @@
                     <label class="block text-xs uppercase font-bold text-slate-500 mb-2">Password</label>
                     <input type="password" id="password" required autocomplete="current-password" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-gray-200 text-sm focus:outline-none focus:border-blue-500">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition duration-200">Otentikasi Akses</button>
+                <button type="submit" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition duration-200">Otentikasi Akses</button>
             </form>
         </div>
     </div>
@@ -194,19 +207,24 @@
     </main>
 
     <script>
-        // 1. KONFIGURASI URL & TOKEN (Mitigasi #41 Data Theft dengan Session Storage)
         const BASE_URL = 'https://back-0amu.onrender.com';
         let token = sessionStorage.getItem("bakoel_super_token");
         let globalTenants = []; 
 
-        // 2. 🛡️ FUNGSI KEAMANAN: ANTI XSS & HTML INJECTION (Mitigasi #1, #4, #93)
+        // 🛡️ SECURITY LAYER 3: Advanced HTML Escaping (Anti XSS & Template Injection)
         function escapeHTML(str) {
-            if (!str) return '-';
-            return str.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            if (str === null || str === undefined) return '-';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;")
+                .replace(/`/g, "&#x60;")
+                .replace(/\//g, "&#x2F;");
         }
         function formatRp(num) { return "Rp " + Number(num).toLocaleString('id-ID'); }
 
-        // 3. LOGIKA TABS
         function switchTab(tabName) {
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-profile').classList.add('hidden');
@@ -217,7 +235,6 @@
             document.getElementById('nav-' + tabName).className = 'nav-active flex items-center w-full text-left px-6 py-3 text-sm transition-colors';
         }
 
-        // 4. OTENTIKASI & SESI
         function checkAuthState() {
             if (token) {
                 document.getElementById('loginSection').classList.add('hidden');
@@ -232,8 +249,18 @@
             }
         }
 
+        // 🛡️ SECURITY LAYER 4: State Locking untuk Mencegah Race Condition & API Abuse
+        let isLoggingIn = false;
         async function handleLogin(e) {
             e.preventDefault();
+            if(isLoggingIn) return;
+            
+            isLoggingIn = true;
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+            btn.disabled = true;
+
             try {
                 const res = await fetch(`${BASE_URL}/api/super/login`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -243,11 +270,14 @@
                 if (res.ok) { token = data.token; sessionStorage.setItem("bakoel_super_token", token); checkAuthState(); } 
                 else { alert(data.error); }
             } catch (err) { alert("Server Pusat Tidak Merespon."); }
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            isLoggingIn = false;
         }
 
         function handleLogout() { sessionStorage.removeItem("bakoel_super_token"); token = null; checkAuthState(); }
 
-        // 5. RENDER DASHBOARD UTAMA
         async function loadDashboardData() {
             try {
                 const resBal = await fetch(`${BASE_URL}/api/super/balances`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -286,15 +316,20 @@
             } catch(e) { console.error(e); }
         }
 
+        // 🛡️ SECURITY LAYER 5: Lock State untuk Mencegah Race Condition Eksekusi Transfer
+        let isProcessingTransfer = false;
         async function approveTransfer(id) {
+            if(isProcessingTransfer) return;
             if(!confirm("Anda yakin dana sudah berhasil ditransfer di bank?")) return;
+            
+            isProcessingTransfer = true;
             try {
                 const res = await fetch(`${BASE_URL}/api/super/withdrawals/${id}/approve`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
-                if(res.ok) { loadDashboardData(); } else { alert("Gagal memproses."); }
+                if(res.ok) { await loadDashboardData(); } else { alert("Gagal memproses."); }
             } catch(e) { alert("Server Error."); }
+            finally { isProcessingTransfer = false; }
         }
 
-        // 6. RENDER TENANT GRID & SEARCH
         async function loadTenantGridSummary() {
             try {
                 const res = await fetch(`${BASE_URL}/api/super/balances`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -362,7 +397,6 @@
             document.getElementById('tenantListView').classList.remove('hidden');
         }
 
-        // 7. RENDER PROFIL DETAIL
         async function fetchAndShowProfile(tenantId) {
             document.getElementById('dt-toko').innerHTML = '<i class="fa-solid fa-spinner fa-spin text-slate-300"></i>';
             try {
@@ -407,7 +441,6 @@
             } catch (err) { alert(err.message); backToTenantList(); }
         }
 
-        // 8. SIMPAN FORM KYC
         async function saveKYC(e) {
             e.preventDefault();
             const tenantId = document.getElementById('kyc-tenant-id').value;
